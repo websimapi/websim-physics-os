@@ -1,4 +1,4 @@
-import * as Matter from 'matter-js';
+const Matter = window.Matter;
 
 class PhysicsSystem {
   constructor() {
