@@ -42,14 +42,28 @@ export class Window {
     
     titlebar.onmousedown = (e) => {
       isDragging = true;
-      dragOffset.x = e.clientX - this.body.position.x;
-      dragOffset.y = e.clientY - this.body.position.y;
+      const zoom = parseFloat(document.getElementById('desktop').style.getPropertyValue('--zoom')) || 1;
+      const panX = parseFloat(document.getElementById('desktop').style.getPropertyValue('--pan-x')) || 0;
+      const panY = parseFloat(document.getElementById('desktop').style.getPropertyValue('--pan-y')) || 0;
+      
+      const scaledX = (e.clientX - panX) / zoom;
+      const scaledY = (e.clientY - panY) / zoom;
+      
+      dragOffset.x = scaledX - this.body.position.x;
+      dragOffset.y = scaledY - this.body.position.y;
     };
     
     document.addEventListener('mousemove', (e) => {
       if (isDragging) {
-        this.body.position.x = e.clientX - dragOffset.x;
-        this.body.position.y = e.clientY - dragOffset.y;
+        const zoom = parseFloat(document.getElementById('desktop').style.getPropertyValue('--zoom')) || 1;
+        const panX = parseFloat(document.getElementById('desktop').style.getPropertyValue('--pan-x')) || 0;
+        const panY = parseFloat(document.getElementById('desktop').style.getPropertyValue('--pan-y')) || 0;
+        
+        const scaledX = (e.clientX - panX) / zoom;
+        const scaledY = (e.clientY - panY) / zoom;
+        
+        this.body.position.x = scaledX - dragOffset.x;
+        this.body.position.y = scaledY - dragOffset.y;
       }
     });
     

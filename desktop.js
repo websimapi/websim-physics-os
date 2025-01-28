@@ -106,16 +106,26 @@ desktop.addEventListener('wheel', (e) => {
   e.preventDefault();
   const delta = e.deltaY > 0 ? 0.9 : 1.1;
   const currentZoom = parseFloat(desktop.style.getPropertyValue('--zoom')) || 1;
-  const newZoom = Math.max(0.2, Math.min(3, currentZoom * delta));
+  const newZoom = Math.max(0.05, Math.min(3, currentZoom * delta));
   desktop.style.setProperty('--zoom', newZoom);
 });
+
+function getScaledMousePosition(e) {
+  const zoom = parseFloat(desktop.style.getPropertyValue('--zoom')) || 1;
+  const panX = parseFloat(desktop.style.getPropertyValue('--pan-x')) || 0;
+  const panY = parseFloat(desktop.style.getPropertyValue('--pan-y')) || 0;
+  
+  return {
+    x: (e.clientX - panX) / zoom,
+    y: (e.clientY - panY) / zoom
+  };
+}
 
 let isPanning = false;
 let panStart = { x: 0, y: 0 };
 let currentPan = { x: 0, y: 0 };
 
 desktop.addEventListener('mousedown', (e) => {
-  // Only start panning if clicking directly on the desktop (not on windows or dock)
   if (e.target === desktop) {
     isPanning = true;
     panStart.x = e.clientX - currentPan.x;
@@ -163,7 +173,83 @@ window.resetSystem = () => {
   new Window('Welcome', '<h1>Welcome to Physics OS!</h1><p>Try dragging windows around and watch them collide! Use the Gravity Controls to add some fun physics!</p>');
 };
 
-// Add some initial windows with random positions
+window.createPlatform = (type) => {
+  const platform = document.createElement('div');
+  platform.className = 'platform';
+  
+  switch(type) {
+    case 'horizontal':
+      platform.style.width = '300px';
+      platform.style.height = '20px';
+      break;
+    case 'vertical':
+      platform.style.width = '20px';
+      platform.style.height = '300px';
+      break;
+    case 'square':
+      platform.style.width = '100px';
+      platform.style.height = '100px';
+      break;
+  }
+  
+  document.getElementById('desktop').appendChild(platform);
+  
+  const updatePosition = (e) => {
+    const mousePos = getScaledMousePosition(e);
+    const rect = platform.getBoundingClientRect();
+    platform.style.left = `${mousePos.x - rect.width/2}px`;
+    platform.style.top = `${mousePos.y - rect.height/2}px`;
+  };
+  
+  const placeObject = (e) => {
+    document.removeEventListener('mousemove', updatePosition);
+    document.removeEventListener('click', placeObject);
+    
+    const mousePos = getScaledMousePosition(e);
+    const rect = platform.getBoundingClientRect();
+    const body = physicsSystem.createStaticPlatform(
+      platform,
+      mousePos.x,
+      mousePos.y,
+      rect.width,
+      rect.height
+    );
+    
+    let isDragging = false;
+    let dragOffset = { x: 0, y: 0 };
+    
+    platform.onmousedown = (e) => {
+      isDragging = true;
+      const mousePos = getScaledMousePosition(e);
+      dragOffset.x = mousePos.x - body.position.x;
+      dragOffset.y = mousePos.y - body.position.y;
+    };
+    
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        const mousePos = getScaledMousePosition(e);
+        Matter.Body.setPosition(body, {
+          x: mousePos.x - dragOffset.x,
+          y: mousePos.y - dragOffset.y
+        });
+      }
+    });
+    
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+    
+    platform.oncontextmenu = (e) => {
+      e.preventDefault();
+      physicsSystem.removePhysicsWindow(platform);
+      platform.remove();
+    };
+  };
+  
+  document.addEventListener('mousemove', updatePosition);
+  document.addEventListener('click', placeObject);
+};
+
 setTimeout(() => {
   new Window('Welcome', '<h1>Welcome to Physics OS!</h1><p>Try dragging windows around and watch them collide! Use the Gravity Controls to add some fun physics!</p>');
   
@@ -217,80 +303,4 @@ window.setGravityStrength = (strength) => {
     const scale = strength / magnitude;
     physicsSystem.setGravity(currentX * scale, currentY * scale);
   }
-};
-
-window.createPlatform = (type) => {
-  const platform = document.createElement('div');
-  platform.className = 'platform';
-  
-  switch(type) {
-    case 'horizontal':
-      platform.style.width = '300px';
-      platform.style.height = '20px';
-      break;
-    case 'vertical':
-      platform.style.width = '20px';
-      platform.style.height = '300px';
-      break;
-    case 'square':
-      platform.style.width = '100px';
-      platform.style.height = '100px';
-      break;
-  }
-  
-  document.getElementById('desktop').appendChild(platform);
-  
-  // Center platform at mouse position
-  const updatePosition = (e) => {
-    const rect = platform.getBoundingClientRect();
-    platform.style.left = `${e.clientX - rect.width/2}px`;
-    platform.style.top = `${e.clientY - rect.height/2}px`;
-  };
-  
-  const placeObject = (e) => {
-    document.removeEventListener('mousemove', updatePosition);
-    document.removeEventListener('click', placeObject);
-    
-    const rect = platform.getBoundingClientRect();
-    const body = physicsSystem.createStaticPlatform(
-      platform,
-      rect.left + rect.width/2,
-      rect.top + rect.height/2,
-      rect.width,
-      rect.height
-    );
-    
-    // Make draggable
-    let isDragging = false;
-    let dragOffset = { x: 0, y: 0 };
-    
-    platform.onmousedown = (e) => {
-      isDragging = true;
-      dragOffset.x = e.clientX - body.position.x;
-      dragOffset.y = e.clientY - body.position.y;
-    };
-    
-    document.addEventListener('mousemove', (e) => {
-      if (isDragging) {
-        Matter.Body.setPosition(body, {
-          x: e.clientX - dragOffset.x,
-          y: e.clientY - dragOffset.y
-        });
-      }
-    });
-    
-    document.addEventListener('mouseup', () => {
-      isDragging = false;
-    });
-    
-    // Add delete on right click
-    platform.oncontextmenu = (e) => {
-      e.preventDefault();
-      physicsSystem.removePhysicsWindow(platform);
-      platform.remove();
-    };
-  };
-  
-  document.addEventListener('mousemove', updatePosition);
-  document.addEventListener('click', placeObject);
 };

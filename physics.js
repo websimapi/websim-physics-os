@@ -14,7 +14,6 @@ class PhysicsSystem {
   }
   
   createPhysicsWindow(window, x, y) {
-    // Create matter.js body
     const body = Matter.Bodies.rectangle(x, y, window.offsetWidth, window.offsetHeight, {
       inertia: Infinity,
       friction: 0.001,
@@ -22,21 +21,18 @@ class PhysicsSystem {
     });
     
     Matter.World.add(this.engine.world, body);
+    this.physicsObjects.set(window, { body });
     
-    // Store reference
-    this.physicsObjects.set(window, {
-      body
-    });
-    
-    // Add bounds if they don't exist
+    // Use much larger bounds (100000x100000)
     if (this.engine.world.bodies.length === 1) {
+      const worldSize = 100000;
       const bounds = [
-        Matter.Bodies.rectangle(window.innerWidth/2, -10, window.innerWidth, 20, { isStatic: true }), // top
-        Matter.Bodies.rectangle(window.innerWidth/2, window.innerHeight+10, window.innerWidth, 20, { isStatic: true }), // bottom
-        Matter.Bodies.rectangle(-10, window.innerHeight/2, 20, window.innerHeight, { isStatic: true }), // left
-        Matter.Bodies.rectangle(window.innerWidth+10, window.innerHeight/2, 20, window.innerHeight, { isStatic: true }) // right
+        Matter.Bodies.rectangle(0, -worldSize/2, worldSize*2, 100, { isStatic: true }), // top
+        Matter.Bodies.rectangle(0, worldSize/2, worldSize*2, 100, { isStatic: true }), // bottom
+        Matter.Bodies.rectangle(-worldSize/2, 0, 100, worldSize*2, { isStatic: true }), // left
+        Matter.Bodies.rectangle(worldSize/2, 0, 100, worldSize*2, { isStatic: true }) // right
       ];
-      Matter.World.add(this.engine.world, ...bounds);
+      Matter.World.add(this.engine.world, bounds);
     }
     
     return body;
