@@ -12,9 +12,12 @@ body {
   width: 100vw;
   height: 100vh;
   --zoom: 1;
+  --pan-x: 0px;
+  --pan-y: 0px;
   transform-origin: center center;
-  transform: scale(var(--zoom));
+  transform: scale(var(--zoom)) translate(calc(var(--pan-x) / var(--zoom)), calc(var(--pan-y) / var(--zoom)));
   transition: transform 0.1s ease-out;
+  cursor: grab;
 }
 
 #dock {
@@ -102,6 +105,7 @@ body {
 }
 
 .gravity-popup {
+  position: fixed;
   background: rgba(255,255,255,0.1);
   backdrop-filter: blur(10px);
   padding: 15px;

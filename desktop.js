@@ -110,8 +110,39 @@ desktop.addEventListener('wheel', (e) => {
   desktop.style.setProperty('--zoom', newZoom);
 });
 
+let isPanning = false;
+let panStart = { x: 0, y: 0 };
+let currentPan = { x: 0, y: 0 };
+
+desktop.addEventListener('mousedown', (e) => {
+  // Only start panning if clicking directly on the desktop (not on windows or dock)
+  if (e.target === desktop) {
+    isPanning = true;
+    panStart.x = e.clientX - currentPan.x;
+    panStart.y = e.clientY - currentPan.y;
+    desktop.style.cursor = 'grabbing';
+  }
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (isPanning) {
+    currentPan.x = e.clientX - panStart.x;
+    currentPan.y = e.clientY - panStart.y;
+    desktop.style.setProperty('--pan-x', `${currentPan.x}px`);
+    desktop.style.setProperty('--pan-y', `${currentPan.y}px`);
+  }
+});
+
+document.addEventListener('mouseup', () => {
+  isPanning = false;
+  desktop.style.cursor = '';
+});
+
 window.resetSystem = () => {
   desktop.style.setProperty('--zoom', initialState.zoom);
+  desktop.style.setProperty('--pan-x', '0px');
+  desktop.style.setProperty('--pan-y', '0px');
+  currentPan = { x: 0, y: 0 };
   
   physicsSystem.setGravity(initialState.gravity.x, initialState.gravity.y);
   
