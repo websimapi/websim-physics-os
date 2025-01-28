@@ -1,4 +1,5 @@
 import { Window } from './windows.js';
+import { physicsSystem } from './physics.js';
 
 // Create dock icons
 const dockIcons = [
