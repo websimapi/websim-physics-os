@@ -43,7 +43,7 @@ dockIcons.forEach(icon => {
 
 // Add some initial windows with random positions
 setTimeout(() => {
-  new Window('Welcome', '<h1>Welcome to Physics OS!</h1><p>Try dragging windows around and watch them collide!</p>');
+  new Window('Welcome', '<h1>Welcome to Physics OS!</h1><p>Try dragging windows around and watch them collide! Use the Gravity Controls to add some fun physics!</p>');
   
   new Window('Gravity Controls', `
     <div class="gravity-controls">
@@ -52,11 +52,11 @@ setTimeout(() => {
         <button onclick="window.setGravityDirection('down')">↓</button>
         <button onclick="window.setGravityDirection('left')">←</button>
         <button onclick="window.setGravityDirection('right')">→</button>
-        <button onclick="window.setGravityDirection('none')">×</button>
+        <button onclick="window.setGravityDirection('none')" style="background: rgba(0,0,0,0.2);">×</button>
       </div>
       <div class="gravity-strength">
         <label>Strength: </label>
-        <input type="range" min="0" max="2" step="0.1" value="0.5" 
+        <input type="range" min="0" max="2" step="0.1" value="0" 
                oninput="window.setGravityStrength(this.value)">
       </div>
     </div>

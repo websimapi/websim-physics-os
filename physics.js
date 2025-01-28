@@ -4,7 +4,7 @@ class PhysicsSystem {
   constructor() {
     // Matter.js setup
     this.engine = Matter.Engine.create();
-    this.engine.gravity.y = 0.5;
+    this.engine.gravity.y = 0;
     
     // Track physics objects
     this.physicsObjects = new Map();
