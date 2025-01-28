@@ -18,6 +18,9 @@ body {
   transform: scale(var(--zoom)) translate(calc(var(--pan-x) / var(--zoom)), calc(var(--pan-y) / var(--zoom)));
   transition: transform 0.1s ease-out;
   cursor: grab;
+  min-width: 100000px;
+  min-height: 100000px;
+  overflow: visible;
 }
 
 #dock {
