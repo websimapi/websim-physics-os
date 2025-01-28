@@ -1,0 +1,80 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #1a1a1a;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+#desktop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+#dock {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.1);
+  padding: 10px 20px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  display: flex;
+  gap: 15px;
+}
+
+.window {
+  position: absolute;
+  background: rgba(255,255,255,0.9);
+  border-radius: 8px;
+  min-width: 300px;
+  min-height: 200px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.window-titlebar {
+  padding: 8px;
+  background: rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  cursor: move;
+}
+
+.window-title {
+  flex: 1;
+  margin: 0;
+  font-size: 14px;
+}
+
+.window-content {
+  flex: 1;
+  overflow: auto;
+  padding: 15px;
+}
+
+.dock-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dock-icon:hover {
+  transform: scale(1.1);
+}
+
+.dock-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: white;
+}
