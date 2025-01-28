@@ -44,4 +44,55 @@ dockIcons.forEach(icon => {
 // Add some initial windows with random positions
 setTimeout(() => {
   new Window('Welcome', '<h1>Welcome to Physics OS!</h1><p>Try dragging windows around and watch them collide!</p>');
+  
+  new Window('Gravity Controls', `
+    <div class="gravity-controls">
+      <div class="gravity-buttons">
+        <button onclick="window.setGravityDirection('up')">↑</button>
+        <button onclick="window.setGravityDirection('down')">↓</button>
+        <button onclick="window.setGravityDirection('left')">←</button>
+        <button onclick="window.setGravityDirection('right')">→</button>
+        <button onclick="window.setGravityDirection('none')">×</button>
+      </div>
+      <div class="gravity-strength">
+        <label>Strength: </label>
+        <input type="range" min="0" max="2" step="0.1" value="0.5" 
+               oninput="window.setGravityStrength(this.value)">
+      </div>
+    </div>
+  `);
 }, 500);
+
+// Add gravity control functions to window object for HTML access
+window.setGravityDirection = (direction) => {
+  switch(direction) {
+    case 'up':
+      physicsSystem.setGravity(0, -0.5);
+      break;
+    case 'down':
+      physicsSystem.setGravity(0, 0.5);
+      break;
+    case 'left':
+      physicsSystem.setGravity(-0.5, 0);
+      break;
+    case 'right':
+      physicsSystem.setGravity(0.5, 0);
+      break;
+    case 'none':
+      physicsSystem.setGravity(0, 0);
+      break;
+  }
+};
+
+window.setGravityStrength = (strength) => {
+  const currentX = physicsSystem.engine.gravity.x;
+  const currentY = physicsSystem.engine.gravity.y;
+  const magnitude = Math.sqrt(currentX * currentX + currentY * currentY);
+  
+  if (magnitude === 0) {
+    physicsSystem.setGravity(0, strength);
+  } else {
+    const scale = strength / magnitude;
+    physicsSystem.setGravity(currentX * scale, currentY * scale);
+  }
+};

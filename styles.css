@@ -78,3 +78,39 @@ body {
   height: 24px;
   fill: white;
 }
+
+.gravity-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.gravity-buttons {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+
+.gravity-buttons button {
+  padding: 10px;
+  font-size: 18px;
+  border: none;
+  background: rgba(0,0,0,0.1);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.gravity-buttons button:hover {
+  background: rgba(0,0,0,0.2);
+}
+
+.gravity-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gravity-strength input {
+  flex: 1;
+}

@@ -50,6 +50,11 @@ class PhysicsSystem {
     }
   }
   
+  setGravity(x, y) {
+    this.engine.gravity.x = x;
+    this.engine.gravity.y = y;
+  }
+  
   animate = () => {
     requestAnimationFrame(this.animate);
     
