@@ -42,6 +42,43 @@ dockIcons.forEach(icon => {
   dock.appendChild(iconElement);
 });
 
+const initialState = {
+  zoom: 1,
+  gravity: { x: 0, y: 0 },
+  gravityStrength: 0
+};
+
+const desktop = document.getElementById('desktop');
+desktop.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const delta = e.deltaY > 0 ? 0.9 : 1.1;
+  const currentZoom = parseFloat(desktop.style.getPropertyValue('--zoom')) || 1;
+  const newZoom = Math.max(0.5, Math.min(2, currentZoom * delta));
+  desktop.style.setProperty('--zoom', newZoom);
+});
+
+window.resetSystem = () => {
+  desktop.style.setProperty('--zoom', initialState.zoom);
+  
+  physicsSystem.setGravity(initialState.gravity.x, initialState.gravity.y);
+  
+  const strengthSlider = document.querySelector('.gravity-strength input');
+  if (strengthSlider) {
+    strengthSlider.value = initialState.gravityStrength;
+  }
+  
+  const windows = document.querySelectorAll('.window');
+  windows.forEach(win => {
+    const title = win.querySelector('.window-title');
+    if (title && !['Gravity Controls', 'Welcome'].includes(title.textContent)) {
+      const closeBtn = win.querySelector('button');
+      closeBtn.click();
+    }
+  });
+  
+  new Window('Welcome', '<h1>Welcome to Physics OS!</h1><p>Try dragging windows around and watch them collide! Use the Gravity Controls to add some fun physics!</p>');
+};
+
 // Add some initial windows with random positions
 setTimeout(() => {
   new Window('Welcome', '<h1>Welcome to Physics OS!</h1><p>Try dragging windows around and watch them collide! Use the Gravity Controls to add some fun physics!</p>');
@@ -60,11 +97,11 @@ setTimeout(() => {
         <input type="range" min="0" max="2" step="0.1" value="0" 
                oninput="window.setGravityStrength(this.value)">
       </div>
+      <button onclick="window.resetSystem()" class="reset-button">Reset System</button>
     </div>
   `);
 }, 500);
 
-// Add gravity control functions to window object for HTML access
 window.setGravityDirection = (direction) => {
   switch(direction) {
     case 'up':
