@@ -59,6 +59,21 @@ const dockIcons = [
     }
   },
   {
+    title: 'Platform',
+    icon: `<svg viewBox="0 0 24 24"><path d="M19 12H5c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2zm0 6H5v-4h14v4z"/></svg>`,
+    onClick: () => {
+      const content = document.createElement('div');
+      content.innerHTML = `
+        <div class="platform-controls">
+          <button onclick="window.createPlatform('horizontal')">Horizontal Platform</button>
+          <button onclick="window.createPlatform('vertical')">Vertical Platform</button>
+          <button onclick="window.createPlatform('square')">Square Platform</button>
+        </div>
+      `;
+      new Window('Platform Creator', content.innerHTML);
+    }
+  },
+  {
     title: 'Reset',
     icon: `<svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>`,
     onClick: () => window.resetSystem()
@@ -91,7 +106,7 @@ desktop.addEventListener('wheel', (e) => {
   e.preventDefault();
   const delta = e.deltaY > 0 ? 0.9 : 1.1;
   const currentZoom = parseFloat(desktop.style.getPropertyValue('--zoom')) || 1;
-  const newZoom = Math.max(0.5, Math.min(2, currentZoom * delta));
+  const newZoom = Math.max(0.2, Math.min(3, currentZoom * delta));
   desktop.style.setProperty('--zoom', newZoom);
 });
 
@@ -171,4 +186,80 @@ window.setGravityStrength = (strength) => {
     const scale = strength / magnitude;
     physicsSystem.setGravity(currentX * scale, currentY * scale);
   }
+};
+
+window.createPlatform = (type) => {
+  const platform = document.createElement('div');
+  platform.className = 'platform';
+  
+  switch(type) {
+    case 'horizontal':
+      platform.style.width = '300px';
+      platform.style.height = '20px';
+      break;
+    case 'vertical':
+      platform.style.width = '20px';
+      platform.style.height = '300px';
+      break;
+    case 'square':
+      platform.style.width = '100px';
+      platform.style.height = '100px';
+      break;
+  }
+  
+  document.getElementById('desktop').appendChild(platform);
+  
+  // Center platform at mouse position
+  const updatePosition = (e) => {
+    const rect = platform.getBoundingClientRect();
+    platform.style.left = `${e.clientX - rect.width/2}px`;
+    platform.style.top = `${e.clientY - rect.height/2}px`;
+  };
+  
+  const placeObject = (e) => {
+    document.removeEventListener('mousemove', updatePosition);
+    document.removeEventListener('click', placeObject);
+    
+    const rect = platform.getBoundingClientRect();
+    const body = physicsSystem.createStaticPlatform(
+      platform,
+      rect.left + rect.width/2,
+      rect.top + rect.height/2,
+      rect.width,
+      rect.height
+    );
+    
+    // Make draggable
+    let isDragging = false;
+    let dragOffset = { x: 0, y: 0 };
+    
+    platform.onmousedown = (e) => {
+      isDragging = true;
+      dragOffset.x = e.clientX - body.position.x;
+      dragOffset.y = e.clientY - body.position.y;
+    };
+    
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        Matter.Body.setPosition(body, {
+          x: e.clientX - dragOffset.x,
+          y: e.clientY - dragOffset.y
+        });
+      }
+    });
+    
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+    
+    // Add delete on right click
+    platform.oncontextmenu = (e) => {
+      e.preventDefault();
+      physicsSystem.removePhysicsWindow(platform);
+      platform.remove();
+    };
+  };
+  
+  document.addEventListener('mousemove', updatePosition);
+  document.addEventListener('click', placeObject);
 };

@@ -14,6 +14,7 @@ body {
   --zoom: 1;
   transform-origin: center center;
   transform: scale(var(--zoom));
+  transition: transform 0.1s ease-out;
 }
 
 #dock {
@@ -182,4 +183,36 @@ body {
 
 .reset-button:hover {
   background: #ff3333;
+}
+
+.platform {
+  position: absolute;
+  background: rgba(255,255,255,0.8);
+  border-radius: 4px;
+  cursor: move;
+  transform-origin: center center;
+  transform: scale(calc(1 / var(--zoom)));
+}
+
+.platform:hover {
+  background: rgba(255,255,255,0.9);
+}
+
+.platform-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.platform-controls button {
+  padding: 10px;
+  border: none;
+  background: rgba(0,0,0,0.1);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.platform-controls button:hover {
+  background: rgba(0,0,0,0.2);
 }

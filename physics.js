@@ -55,6 +55,20 @@ class PhysicsSystem {
     this.engine.gravity.y = y;
   }
   
+  createStaticPlatform(element, x, y, width, height) {
+    const body = Matter.Bodies.rectangle(x, y, width, height, {
+      isStatic: true,
+      render: {
+        fillStyle: '#F0F0F0'
+      }
+    });
+    
+    Matter.World.add(this.engine.world, body);
+    this.physicsObjects.set(element, { body });
+    
+    return body;
+  }
+  
   animate = () => {
     requestAnimationFrame(this.animate);
     
